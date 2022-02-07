@@ -1,13 +1,12 @@
 defmodule Fhc.Utils do
   require Logger
-  alias Fhc.EnvVars
-  # alias Calendar.DateTime.Format
 
   @spec set_headers :: [{<<_::64, _::_*8>>, binary}, ...]
   def set_headers(), do: set_headers([])
 
   def set_headers(headers) when is_list(headers) do
-    request_headers = [{"Authorization", bearer_token()}] ++ headers
+    # request_headers = [{"Authorization", bearer_token()}] ++ headers
+    request_headers = [] ++ headers
     Logger.debug("#{__MODULE__}.set_headers/1 url = #{inspect(request_headers)}")
     request_headers
   end
@@ -38,10 +37,10 @@ defmodule Fhc.Utils do
     url_encoded_body
   end
 
-  def build_url(method) when is_binary(method) do
-    url = EnvVars.base_url() <> method
-    Logger.debug("#{__MODULE__}.build_url/1 url = #{inspect(url)}")
-    url
+  def build_url(base_url, method) when is_binary(base_url) and is_binary(method) do
+    base_url <> method
+    Logger.debug("#{__MODULE__}.build_url/1 base_url = #{inspect(base_url)}")
+    base_url
   end
 
   @spec decode_json_body(binary | {:error, any} | {:ok, any}) :: any

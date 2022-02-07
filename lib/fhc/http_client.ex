@@ -10,17 +10,17 @@ defmodule Fhc.HttpClient do
   """
   @spec child_spec(any) ::
           {Finch, [{:name, Fhc.HttpClient} | {:pools, map}, ...]}
-  def child_spec(args) do
+  def child_spec(%{base_url: base_url, pool_size: pool_size} = args) do
     Logger.info(
-      "#{__MODULE__}.child_spec/1 Starting the #{__MODULE__} http client with a pool of #{inspect(args.pool_size)} connections"
+      "#{__MODULE__}.child_spec/1 Starting the test http client with a pool of #{inspect(pool_size)} connections"
     )
 
-    Logger.debug("#{__MODULE__}.child_spec/1 args = #{inspect(args)}")
+    Logger.debug("#{__MODULE__}.child_spec(#{inspect(args)})")
 
     {Finch,
      name: __MODULE__,
      pools: %{
-       args.base_url => [size: args.pool_size]
+       base_url => [size: pool_size]
      }}
   end
 
@@ -33,21 +33,21 @@ defmodule Fhc.HttpClient do
              optional(:module) => any
            }}
           | {:ok, Finch.Response.t()}
-  def get(api_method) when is_binary(api_method) do
+  def get(url) when is_binary(url) do
     :get
     |> Finch.build(
-      build_url(api_method),
+      url,
       set_headers()
     )
     |> Finch.request(__MODULE__)
     |> parse_http_client_response("get/1")
   end
 
-  def post_application_json(api_method, body, headers \\ [{"Content-Type", "application/json"}])
-      when is_binary(api_method) and is_list(headers) and is_map(body) do
+  def post_application_json(url, body, headers \\ [{"Content-Type", "application/json"}])
+      when is_binary(url) and is_list(headers) and is_map(body) do
     :post
     |> Finch.build(
-      build_url(api_method),
+      url,
       set_headers(headers),
       build_json_body(body)
     )
@@ -56,14 +56,14 @@ defmodule Fhc.HttpClient do
   end
 
   def post_application_x_www_form_urlencoded(
-        api_method,
+        url,
         body,
         headers \\ [{"Content-Type", "application/x-www-form-urlencoded"}]
       )
-      when is_binary(api_method) and is_list(headers) and is_map(body) do
+      when is_binary(url) and is_list(headers) and is_map(body) do
     :post
     |> Finch.build(
-      build_url(api_method),
+      url,
       set_headers(headers),
       build_url_encoded_body(body)
     )
