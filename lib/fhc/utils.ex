@@ -5,10 +5,8 @@ defmodule Fhc.Utils do
   def set_headers(), do: set_headers([])
 
   def set_headers(headers) when is_list(headers) do
-    # request_headers = [{"Authorization", bearer_token()}] ++ headers
-    request_headers = [] ++ headers
-    Logger.debug("#{__MODULE__}.set_headers/1 url = #{inspect(request_headers)}")
-    request_headers
+    Logger.debug("#{__MODULE__}.set_headers/1 url = #{inspect(headers)}")
+    headers
   end
 
   def build_json_body(map) when is_map(map) do

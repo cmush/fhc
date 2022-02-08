@@ -43,6 +43,10 @@ defmodule Fhc.HttpClient do
     |> parse_http_client_response("get/1")
   end
 
+  @spec post_application_json(binary, map, maybe_improper_list) ::
+          :ok
+          | {:error, %{:__exception__ => true, :__struct__ => atom, optional(atom) => any}}
+          | %Fhc.Response{body: any, headers: list, status: non_neg_integer}
   def post_application_json(url, body, headers \\ [{"Content-Type", "application/json"}])
       when is_binary(url) and is_list(headers) and is_map(body) do
     :post
@@ -52,7 +56,7 @@ defmodule Fhc.HttpClient do
       build_json_body(body)
     )
     |> Finch.request(__MODULE__)
-    |> parse_http_client_response("post/2")
+    |> parse_http_client_response("post_application_json/3")
   end
 
   def post_application_x_www_form_urlencoded(
@@ -68,7 +72,25 @@ defmodule Fhc.HttpClient do
       build_url_encoded_body(body)
     )
     |> Finch.request(__MODULE__)
-    |> parse_http_client_response("post/2")
+    |> parse_http_client_response("post_application_x_www_form_urlencoded/3")
+  end
+
+  def post_multipart_form_data(url, multipart_body, headers) do
+    # {"Content-Length", Multipart.content_length(multipart_body)}
+    headers =
+      ([
+         {"Content-Type", Multipart.content_type(multipart_body, "multipart/form-data")}
+       ] ++ headers)
+      |> set_headers()
+
+    :post
+    |> Finch.build(
+      url,
+      headers,
+      {:stream, Multipart.body_stream(multipart_body)}
+    )
+    |> Finch.request(__MODULE__)
+    |> parse_http_client_response("post_multipart_form_data/3")
   end
 
   defp parse_http_client_response(response, http_client_method)
