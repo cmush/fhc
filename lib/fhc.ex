@@ -16,6 +16,7 @@ defmodule Fhc do
   defdelegate set_headers, to: Utils
   defdelegate build_json_body(map), to: Utils
   defdelegate build_url_encoded_body(map), to: Utils
+  defdelegate build_url(base_url, method), to: Utils
   defdelegate decode_json_body(body), to: Utils
   defdelegate bearer_token(), to: Utils
 end
