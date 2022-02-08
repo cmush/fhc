@@ -36,9 +36,9 @@ defmodule Fhc.Utils do
   end
 
   def build_url(base_url, method) when is_binary(base_url) and is_binary(method) do
-    base_url <> method
-    Logger.debug("#{__MODULE__}.build_url/1 base_url = #{inspect(base_url)}")
-    base_url
+    url = base_url <> method
+    Logger.debug("#{__MODULE__}.build_url/1 url = #{inspect(url)}")
+    url
   end
 
   @spec decode_json_body(binary | {:error, any} | {:ok, any}) :: any
