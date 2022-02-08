@@ -2,7 +2,6 @@ defmodule Fhc.HttpClient do
   alias Finch.Response
   require Logger
   import Fhc.Utils
-  # alias Multipart.Part
 
   @doc """
   - defines the child spec for the Finch connection pool
@@ -24,20 +23,16 @@ defmodule Fhc.HttpClient do
      }}
   end
 
-  @spec get(binary()) ::
-          {:error,
-           %{
-             :__exception__ => any,
-             :__struct__ => Mint.HTTPError | Mint.TransportError,
-             :reason => any,
-             optional(:module) => any
-           }}
-          | {:ok, Finch.Response.t()}
-  def get(url) when is_binary(url) do
+  @spec get(binary, maybe_improper_list) ::
+          :ok
+          | {:error, %{:__exception__ => true, :__struct__ => atom, optional(atom) => any}}
+          | %Fhc.Response{body: any, headers: list, status: non_neg_integer}
+  def get(url, headers) when is_binary(url) do
+    headers = set_headers([], headers)
     :get
     |> Finch.build(
       url,
-      set_headers()
+      headers
     )
     |> Finch.request(__MODULE__)
     |> parse_http_client_response("get/1")
@@ -47,12 +42,14 @@ defmodule Fhc.HttpClient do
           :ok
           | {:error, %{:__exception__ => true, :__struct__ => atom, optional(atom) => any}}
           | %Fhc.Response{body: any, headers: list, status: non_neg_integer}
-  def post_application_json(url, body, headers \\ [{"Content-Type", "application/json"}])
+  def post_application_json(url, body, headers)
       when is_binary(url) and is_list(headers) and is_map(body) do
+    headers = [{"Content-Type", "application/json"}] |> set_headers(headers)
+
     :post
     |> Finch.build(
       url,
-      set_headers(headers),
+      headers,
       build_json_body(body)
     )
     |> Finch.request(__MODULE__)
@@ -62,13 +59,15 @@ defmodule Fhc.HttpClient do
   def post_application_x_www_form_urlencoded(
         url,
         body,
-        headers \\ [{"Content-Type", "application/x-www-form-urlencoded"}]
+        headers
       )
       when is_binary(url) and is_list(headers) and is_map(body) do
+    headers = [{"Content-Type", "application/x-www-form-urlencoded"}] |> set_headers(headers)
+
     :post
     |> Finch.build(
       url,
-      set_headers(headers),
+      headers,
       build_url_encoded_body(body)
     )
     |> Finch.request(__MODULE__)
@@ -78,10 +77,10 @@ defmodule Fhc.HttpClient do
   def post_multipart_form_data(url, multipart_body, headers) do
     # {"Content-Length", Multipart.content_length(multipart_body)}
     headers =
-      ([
-         {"Content-Type", Multipart.content_type(multipart_body, "multipart/form-data")}
-       ] ++ headers)
-      |> set_headers()
+      [
+        {"Content-Type", Multipart.content_type(multipart_body, "multipart/form-data")}
+      ]
+      |> set_headers(headers)
 
     :post
     |> Finch.build(

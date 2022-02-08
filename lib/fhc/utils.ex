@@ -1,10 +1,9 @@
 defmodule Fhc.Utils do
   require Logger
 
-  @spec set_headers :: [{<<_::64, _::_*8>>, binary}, ...]
-  def set_headers(), do: set_headers([])
-
-  def set_headers(headers) when is_list(headers) do
+  def set_headers(default_headers, headers \\ [])
+      when is_list(default_headers) and is_list(headers) do
+    headers = default_headers ++ headers
     Logger.debug("#{__MODULE__}.set_headers/1 url = #{inspect(headers)}")
     headers
   end
