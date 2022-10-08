@@ -20,22 +20,23 @@ defmodule Fhc.Utils do
     end
   end
 
-  def build_url_encoded_body(map) when is_map(map) do
-    url_encoded_body =
+  def build_url_encoded_body(query_params), do: key_value(query_params)
+  def build_query_params(query_params), do: key_value(query_params)
+
+  def key_value(map) when is_map(map),
+    do:
       map
       |> Enum.map_join("&", fn {key, value} ->
         "#{key}=#{value}"
       end)
 
-    Logger.debug(
-      "#{__MODULE__}.build_url_encoded_body/1 url_encoded_body = #{inspect(url_encoded_body)}"
-    )
+  def build_url(base_url, method, query_params \\ %{})
+      when is_binary(base_url) and is_binary(method) do
+    url =
+      if query_params == %{},
+        do: base_url <> method,
+        else: base_url <> method <> "?" <> build_query_params(query_params)
 
-    url_encoded_body
-  end
-
-  def build_url(base_url, method) when is_binary(base_url) and is_binary(method) do
-    url = base_url <> method
     Logger.debug("#{__MODULE__}.build_url/1 url = #{inspect(url)}")
     url
   end
