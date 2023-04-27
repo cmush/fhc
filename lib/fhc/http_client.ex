@@ -29,6 +29,7 @@ defmodule Fhc.HttpClient do
           | %Fhc.Response{body: any, headers: list, status: non_neg_integer}
   def get(url, headers) when is_binary(url) do
     headers = set_headers([], headers)
+
     :get
     |> Finch.build(
       url,
@@ -102,22 +103,22 @@ defmodule Fhc.HttpClient do
           "#{__MODULE__}.#{http_client_method} failed request, transport error #{inspect(error)}"
         )
 
-      {:ok, %Response{headers: headers, body: body, status: status}} ->
-        decoded_json_body = body |> decode_json_body()
+      {:ok, %Response{headers: headers, body: _body, status: status} = response} ->
+        decoded_body = decode_response(response)
 
         Logger.debug(
           "#{__MODULE__}.#{http_client_method}'s response headers = #{inspect(headers)}"
         )
 
         Logger.debug(
-          "#{__MODULE__}.#{http_client_method}'s decoded json response body = #{inspect(decoded_json_body)}"
+          "#{__MODULE__}.#{http_client_method}'s decoded response body = #{inspect(decoded_body)}"
         )
 
         Logger.debug(
           "#{__MODULE__}.#{http_client_method}'s http response status code = #{inspect(status)}"
         )
 
-        %Fhc.Response{headers: headers, body: decoded_json_body, status: status}
+        %Fhc.Response{headers: headers, body: decoded_body, status: status}
 
       response ->
         Logger.warning(

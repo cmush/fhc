@@ -41,6 +41,20 @@ defmodule Fhc.Utils do
     url
   end
 
+  def decode_response(%Finch.Response{
+        headers: headers,
+        body: body,
+        status: _status
+      }) do
+    content_type = Enum.into(headers, %{})["content-type"]
+
+    cond do
+      String.contains?(content_type, "application/json") -> decode_json_body(body)
+      String.contains?(content_type, "application/octet-stream") -> body
+      true -> body
+    end
+  end
+
   @spec decode_json_body(binary | {:error, any} | {:ok, any}) :: any
   def decode_json_body(body) when is_binary(body), do: Jason.decode(body) |> decode_json_body()
   def decode_json_body({:ok, json_map}), do: json_map
