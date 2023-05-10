@@ -105,6 +105,13 @@ defmodule Fhc.HttpClient do
 
         {:error, :service_unavailable, error}
 
+      {:error, error} ->
+        Logger.error(
+          "#{__MODULE__}.#{http_client_method} failed request, error #{inspect(error)}"
+        )
+
+        {:error, error}
+
       {:ok, %Response{headers: headers, body: _body, status: status} = response} ->
         decoded_body = decode_response(response)
 
@@ -121,13 +128,6 @@ defmodule Fhc.HttpClient do
         )
 
         %Fhc.Response{headers: headers, body: decoded_body, status: status}
-
-      response ->
-        Logger.warning(
-          "#{__MODULE__}.#{http_client_method} error decoding response = #{inspect(response)}"
-        )
-
-        {:error, :decoding_response, response}
     end
   end
 end
