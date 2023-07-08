@@ -4,18 +4,18 @@ defmodule Fhc.Utils do
   def set_headers(default_headers, headers \\ [])
       when is_list(default_headers) and is_list(headers) do
     headers = default_headers ++ headers
-    Logger.debug("#{__MODULE__}.set_headers/1 url = #{inspect(headers)}")
+    # Logger.debug("#{__MODULE__}.set_headers/1 url = #{inspect(headers)}")
     headers
   end
 
   def build_json_body(map) when is_map(map) do
     case Jason.encode(map) do
       {:ok, json_body} ->
-        Logger.debug("#{__MODULE__}.build_json_body/1 json_body = #{inspect(json_body)}")
+        # Logger.debug("#{__MODULE__}.build_json_body/1 json_body = #{inspect(json_body)}")
         json_body
 
-      error ->
-        Logger.error("#{__MODULE__}.build_json_body/1 error = #{inspect(error)}")
+      _error ->
+        # Logger.error("#{__MODULE__}.build_json_body/1 error = #{inspect(error)}")
         :invalid_body
     end
   end
@@ -37,7 +37,7 @@ defmodule Fhc.Utils do
         do: base_url <> method,
         else: base_url <> method <> "?" <> build_query_params(query_params)
 
-    Logger.debug("#{__MODULE__}.build_url/1 url = #{inspect(url)}")
+    # Logger.debug("#{__MODULE__}.build_url/1 url = #{inspect(url)}")
     url
   end
 

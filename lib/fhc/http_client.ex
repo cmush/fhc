@@ -115,17 +115,17 @@ defmodule Fhc.HttpClient do
       {:ok, %Response{headers: headers, body: _body, status: status} = response} ->
         decoded_body = decode_response(response)
 
-        Logger.debug(
-          "#{__MODULE__}.#{http_client_method}'s response headers = #{inspect(headers)}"
-        )
+        # Logger.debug(
+        #   "#{__MODULE__}.#{http_client_method}'s response headers = #{inspect(headers)}"
+        # )
 
-        Logger.debug(
-          "#{__MODULE__}.#{http_client_method}'s decoded response body = #{inspect(decoded_body)}"
-        )
+        # Logger.debug(
+        #   "#{__MODULE__}.#{http_client_method}'s decoded response body = #{inspect(decoded_body)}"
+        # )
 
-        Logger.debug(
-          "#{__MODULE__}.#{http_client_method}'s http response status code = #{inspect(status)}"
-        )
+        # Logger.debug(
+        #   "#{__MODULE__}.#{http_client_method}'s http response status code = #{inspect(status)}"
+        # )
 
         %Fhc.Response{headers: headers, body: decoded_body, status: status}
     end
