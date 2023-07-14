@@ -1,4 +1,5 @@
 defmodule Fhc.Utils do
+  @moduledoc false
   require Logger
 
   def set_headers(default_headers, headers \\ [])
@@ -56,9 +57,11 @@ defmodule Fhc.Utils do
   end
 
   @spec decode_json_body(binary | {:error, any} | {:ok, any}) :: any
-  def decode_json_body(body) when is_binary(body), do: Jason.decode(body) |> decode_json_body()
+  def decode_json_body(body) when is_binary(body),
+    do: body |> Jason.decode() |> decode_json_body()
+
   def decode_json_body({:ok, json_map}), do: json_map
-  def decode_json_body({:error, error}), do: IO.inspect(error, label: "decode_json_body/1 error")
+  def decode_json_body({:error, error}), do: error
 
   def bearer_token(), do: "Bearer TODO}"
 end

@@ -1,4 +1,5 @@
 defmodule Fhc.HttpClient do
+  @moduledoc false
   alias Finch.Response
   require Logger
   import Fhc.Utils
@@ -26,7 +27,7 @@ defmodule Fhc.HttpClient do
   @spec get(binary, maybe_improper_list) ::
           :ok
           | {:error, %{:__exception__ => true, :__struct__ => atom, optional(atom) => any}}
-          | %Fhc.Response{body: any, headers: list, status: non_neg_integer}
+          | Response.t()
   def get(url, headers) when is_binary(url) do
     headers = set_headers([], headers)
 
@@ -42,7 +43,7 @@ defmodule Fhc.HttpClient do
   @spec post_application_json(binary, map, maybe_improper_list) ::
           :ok
           | {:error, %{:__exception__ => true, :__struct__ => atom, optional(atom) => any}}
-          | %Fhc.Response{body: any, headers: list, status: non_neg_integer}
+          | Response.t()
   def post_application_json(url, body, headers)
       when is_binary(url) and is_list(headers) and is_map(body) do
     headers = [{"Content-Type", "application/json"}] |> set_headers(headers)
